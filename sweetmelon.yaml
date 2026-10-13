@@ -1,0 +1,24 @@
+# Release of the Sweetmelon core this app is built for. Change it on purpose
+# (sweetmelon upgrade), after reading the core CHANGELOG.
+core: "2.4"
+
+project:
+  name: sweetmelon_music_player
+  display_name: "Sweetmelon Music Player"
+  version: 1.0.0
+  # com.example triggers a validator warning on purpose: change it before publishing.
+  application_id: com.example.sweetmelon_music_player
+  dart_package: sweetmelon_music_player
+  icon: icon.png
+
+# auto: the plugins the app calls are on, the rest are off.
+# `include` pins the ones this app relies on, so a scan that cannot resolve a
+# call never silently drops playback. Check with:
+#   dart run bin/sweetmelon.dart detect --www www
+#   npm run detect            # same report, no Dart needed (reads www/)
+plugin_selection:
+  mode: auto
+  include: [audio, storage, toast, wake_lock, share, file_picker, back_button, haptic]
+  exclude: []
+
+plugins: {}

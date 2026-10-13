@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Sweetmelon Music Player</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!--
+      The bridge SDK. In a Sweetmelon build this file is the core copy
+      (assets/www/js/native-sdk.js) and defines window.NativeSDK. The copy in
+      app/public/js is a placeholder for the browser dev server.
+
+      sweetmelon:uses audio, storage, toast, wake_lock, share, file_picker, back_button, haptic
+    -->
+    <script src="js/native-sdk.js"></script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

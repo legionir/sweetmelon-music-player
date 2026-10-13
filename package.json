@@ -1,0 +1,38 @@
+{
+  "name": "sweetmelon-music-player",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Music player web app for the Sweetmelon core (React + Vite + Tailwind)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "playground": "node tool/build-playground.mjs && vite preview --config vite.playground.config.ts",
+    "typecheck": "tsc --noEmit",
+    "detect": "node tool/detect-check.mjs",
+    "smoke": "node tool/build-playground.mjs && node tool/smoke-test.mjs",
+    "smoke:web": "npm run build && node tool/smoke-test.mjs www"
+  },
+  "dependencies": {
+    "clsx": "2.1.1",
+    "framer-motion": "^14.2.0",
+    "lucide-react": "^1.56.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "react-router-dom": "^7.18.4",
+    "tailwind-merge": "3.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.1.17",
+    "@types/node": "22.19.17",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.1.1",
+    "jsdom": "^30.1.2",
+    "tailwindcss": "4.1.17",
+    "typescript": "5.9.3",
+    "vite": "7.3.2",
+    "vite-plugin-singlefile": "2.3.0"
+  }
+}
