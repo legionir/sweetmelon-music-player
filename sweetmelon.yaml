@@ -9,13 +9,16 @@ project:
   # com.example triggers a validator warning on purpose: change it before publishing.
   application_id: com.example.sweetmelon_music_player
   dart_package: sweetmelon_music_player
-  # icon: icon.png            # square PNG, 1024 px or more
+  icon: icon.png
 
-# auto: the plugins your JavaScript calls are on, the rest are off.
-# Check with: dart run bin/sweetmelon.dart detect --www www
+# auto: the plugins the app calls are on, the rest are off.
+# `include` pins the ones this app relies on, so a scan that cannot resolve a
+# call never silently drops playback. Check with:
+#   dart run bin/sweetmelon.dart detect --www www
+#   npm run detect            # same report, no Dart needed (reads www/)
 plugin_selection:
   mode: auto
-  include: []
+  include: [audio, storage, toast, wake_lock, share, file_picker, back_button, haptic]
   exclude: []
 
 plugins: {}

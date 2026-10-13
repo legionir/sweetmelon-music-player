@@ -1,3 +1,11 @@
 .sweetmelon/
 build/
 .dart_tool/
+
+# JS toolchain
+node_modules/
+.vite/
+npm-debug.log*
+
+# Simulated-bridge demo bundle: npm run playground
+/playground/
