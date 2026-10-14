@@ -127,12 +127,37 @@ export async function hydrateLibrary(): Promise<void> {
  * audio files to "On this device". Returns the tracks that were added.
  */
 export async function importAudioFiles(): Promise<Track[]> {
-  const files: PickedFile[] = await pickAudioFiles();
+  return addDeviceFiles(await pickAudioFiles());
+}
+
+/** A playable track for a file on the device, without adding it to the library. */
+export function deviceTrack(file: PickedFile): Track {
+  const id = `device-${hashId(file.path)}`;
+  const known = importedFiles.find((entry) => entry.id === id);
+  return withLike(
+    fileToTrack(
+      known ?? {
+        id,
+        name: file.name || file.path.split("/").pop() || "audio",
+        path: file.path,
+        size: file.size,
+        addedAt: new Date().toISOString(),
+      },
+    ),
+  );
+}
+
+/** Adds files (picked or found by browsing) to "On this device". Returns the new tracks. */
+export async function addDeviceFiles(files: PickedFile[]): Promise<Track[]> {
   if (files.length === 0) return [];
 
   const known = new Set(importedFiles.map((file) => file.path));
   const added: ImportedFile[] = files
-    .filter((file) => Boolean(file.path) && !known.has(file.path))
+    .filter((file) => {
+      if (!file.path || known.has(file.path)) return false;
+      known.add(file.path);
+      return true;
+    })
     .map((file) => ({
       id: `device-${hashId(file.path)}`,
       name: file.name || file.path.split("/").pop() || "audio",

@@ -60,7 +60,7 @@ export function PlayerBar() {
 
   return (
     <>
-      <footer className="fixed inset-x-0 bottom-0 z-40 border-t border-white/5 bg-[#0a0a12]/90 px-3 py-3 backdrop-blur-2xl sm:px-5">
+      <footer className="fixed inset-x-0 bottom-0 z-40 border-t border-white/5 bg-[#0a0a12]/90 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-2xl sm:px-5">
         {/* progress bar */}
         <div className="group absolute inset-x-0 -top-1 flex h-2 w-full items-center px-0">
           <input

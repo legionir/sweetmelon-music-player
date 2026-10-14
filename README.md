@@ -1,7 +1,7 @@
 # sweetmelon-music-player
 
 A music player app for the [Sweetmelon](https://github.com/legionir/sweetmelon)
-core **v2.4.2**. The UI comes from the *Modern Music Player* React template, the
+core **v2.5.0**. The UI comes from the *Modern Music Player* React template, the
 project structure from
 [sweetmelon-app-template](https://github.com/legionir/sweetmelon-app-template),
 and playback, storage and the rest of the device side go through the core's
@@ -74,7 +74,7 @@ Every bridge call is logged as `[bridge] audio.play {...}` in the console.
 Actions tab → **Build app** → *Run workflow*: set the package name, Dart package
 name and app name (empty keeps `sweetmelon.yaml`), tick APK / AAB / iOS. The job
 installs the JS toolchain, builds `app/` into `www/`, and hands it to
-[`legionir/sweetmelon@v2.4.2`](https://github.com/legionir/sweetmelon).
+[`legionir/sweetmelon@v2.5.0`](https://github.com/legionir/sweetmelon).
 
 Signing with your own key needs `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`,
 `KEY_ALIAS` and `KEY_PASSWORD` repository secrets; without them builds are

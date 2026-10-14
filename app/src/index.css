@@ -3,11 +3,42 @@
 
 html {
   color-scheme: dark;
+  /* No sideways scroll and no pinch/double-tap zoom: this is an app, not a page. */
+  overflow-x: hidden;
+  touch-action: pan-x pan-y;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   font-family: "Outfit", ui-sans-serif, system-ui, sans-serif;
   background-color: #07070d;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  /* Space for the status bar; set from the safe_area plugin in main.tsx. */
+  padding-top: var(--safe-top, 0px);
+}
+
+/* Text is not selectable, nothing can be dragged or long-pressed into a menu. */
+* {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ...except the places where the user types. */
+input[type="text"],
+input[type="search"],
+input:not([type]),
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+img {
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 
 /* Custom range slider (seek + volume) */

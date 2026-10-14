@@ -67,6 +67,34 @@ export interface SweetmelonSdk {
   haptic: {
     lightImpact(): Promise<unknown>;
   };
+
+  permission: {
+    request(permission: string): Promise<unknown>;
+  };
+
+  safeArea: {
+    getInsets(): Promise<{ padding?: { top?: number; bottom?: number } }>;
+  };
+
+  fileSystem: {
+    browse(path?: string, options?: { extensions?: string[] }): Promise<BrowseResult>;
+  };
+}
+
+export interface BrowseEntry {
+  name: string;
+  path: string;
+  type: "file" | "directory";
+  size: number;
+  extension?: string;
+}
+
+export interface BrowseResult {
+  /** Folder that was listed ("" = the list of storage roots). */
+  path: string;
+  /** Folder one level up: "" for a storage root, null at the list of roots. */
+  parent: string | null;
+  items: BrowseEntry[];
 }
 
 export interface PickedFile {

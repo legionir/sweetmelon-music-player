@@ -167,8 +167,8 @@ export function Explorer() {
       )}
 
       {/* Track list toolbar */}
-      <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => playAll()}
             disabled={sortedTracks.length === 0}
@@ -257,7 +257,7 @@ export function Explorer() {
             {folderId === "device" && <HardDrive className="h-6 w-6 text-white/20" />}
             <p className="text-sm text-white/30">
               {folderId === "device"
-                ? "No imported files yet. Use Import to add audio from this device — the file picker plugin copies the path, the audio plugin plays it."
+                ? "No imported files yet. Use the Files tab to browse your storage and add whole folders, or Import to pick files."
                 : folderId === "favorites"
                   ? "Nothing liked yet. Tap the heart on a track."
                   : "No audio files found here."}

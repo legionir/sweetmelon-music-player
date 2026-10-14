@@ -17,7 +17,8 @@ export type EngineEvent =
   | { type: "duration"; seconds: number }
   | { type: "playing"; value: boolean }
   | { type: "loading"; value: boolean }
-  | { type: "ended" };
+  | { type: "ended" }
+  | { type: "error"; message: string };
 
 export interface LoadOptions {
   /** Start position in seconds (0 = from the beginning). */
@@ -41,6 +42,13 @@ export interface PlaybackEngine {
 }
 
 type Emit = (event: EngineEvent) => void;
+
+/** The bridge rejects with `{ code, message }`, not an Error. */
+function errorText(error: unknown): string {
+  if (typeof error === "string") return error;
+  const message = (error as { message?: unknown } | null)?.message;
+  return typeof message === "string" && message ? message : "Playback failed";
+}
 
 function isRemoteSource(src: string): boolean {
   return /^https?:\/\//i.test(src);
@@ -155,21 +163,34 @@ function createNativeEngine(emit: Emit): PlaybackEngine {
       emit({ type: "loading", value: true });
       startTimer();
 
+      // Replace whatever was playing: `play` switches the source anyway. A
+      // failing stop (nothing was playing) must not cancel the load.
       try {
-        // Replace whatever was playing: `play` switches the source anyway.
         await window.NativeSDK.audio.stop();
+      } catch {
+        /* nothing to stop */
+      }
+
+      try {
         if (isRemoteSource(track.src)) {
           await window.NativeSDK.audio.play({ url: track.src, volume });
         } else {
           await window.NativeSDK.audio.play({ path: track.src, volume });
         }
         loadedId = track.id;
-        if (startAt > 0.5) {
-          await window.NativeSDK.audio.seek(Math.round(startAt * 1000));
-        }
-      } catch {
+      } catch (error) {
         emit({ type: "loading", value: false });
+        emit({ type: "playing", value: false });
+        emit({ type: "error", message: errorText(error) });
         return;
+      }
+
+      if (startAt > 0.5) {
+        try {
+          await window.NativeSDK.audio.seek(Math.round(startAt * 1000));
+        } catch {
+          /* the track plays from the start */
+        }
       }
 
       if (durationSec > 0) emit({ type: "duration", seconds: durationSec });
@@ -273,7 +294,11 @@ function createWebEngine(emit: Emit): PlaybackEngine {
   audio.addEventListener("waiting", () => emit({ type: "loading", value: true }));
   audio.addEventListener("canplay", () => emit({ type: "loading", value: false }));
   audio.addEventListener("ended", () => emit({ type: "ended" }));
-  audio.addEventListener("error", () => emit({ type: "loading", value: false }));
+  audio.addEventListener("error", () => {
+    if (!audio.getAttribute("src")) return;
+    emit({ type: "loading", value: false });
+    emit({ type: "error", message: "This file cannot be played" });
+  });
 
   const playElement = async () => {
     try {

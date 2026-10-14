@@ -1,11 +1,11 @@
-# Pinned to core v2.4.2. Change it with: sweetmelon upgrade --to <version>
+# Pinned to core v2.5.0. Change it with: sweetmelon upgrade --to <version>
 #
 # Every job builds the web app from app/ first (npm ci + npm run build), so the
 # package always matches the sources in this repository. The Sweetmelon action
 # then injects the core's js/native-sdk.js into www/ and, because
 # sweetmelon.yaml uses plugin_selection.mode "auto", switches on the plugins the
 # app calls (npm run detect prints that list: audio, storage, toast, wake_lock,
-# share, file_picker, back_button, haptic).
+# share, file_picker, back_button, haptic, file_system, permission, safe_area).
 name: Build app
 
 on:
@@ -52,7 +52,7 @@ jobs:
       - name: Smoke test the bundle
         run: npm run smoke
 
-      - uses: legionir/sweetmelon@v2.4.2
+      - uses: legionir/sweetmelon@v2.5.0
         with:
           target: apk
           www: www
@@ -88,7 +88,7 @@ jobs:
       - name: Smoke test the bundle
         run: npm run smoke
 
-      - uses: legionir/sweetmelon@v2.4.2
+      - uses: legionir/sweetmelon@v2.5.0
         with:
           target: aab
           www: www
@@ -124,7 +124,7 @@ jobs:
       - name: Smoke test the bundle
         run: npm run smoke
 
-      - uses: legionir/sweetmelon@v2.4.2
+      - uses: legionir/sweetmelon@v2.5.0
         with:
           target: ios
           www: www
