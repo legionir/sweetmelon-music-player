@@ -23,7 +23,7 @@ export function QueueDrawer({ open, onClose }: { open: boolean; onClose: () => v
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 right-0 top-0 z-50 flex w-full max-w-sm flex-col border-l border-white/10 bg-[#0d0d18]/95 p-5 backdrop-blur-2xl"
+            className="fixed bottom-0 right-0 top-0 z-50 flex w-full max-w-sm flex-col border-l border-white/10 bg-[#0d0d18]/95 px-5 pb-5 pt-[calc(var(--safe-top)+1rem)] backdrop-blur-2xl"
           >
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2 text-white">
@@ -36,7 +36,7 @@ export function QueueDrawer({ open, onClose }: { open: boolean; onClose: () => v
               </button>
             </div>
 
-            <div className="flex-1 space-y-1 overflow-y-auto pr-1">
+            <div className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain pr-1">
               {queue.length === 0 && (
                 <p className="mt-10 text-center text-sm text-white/30">
                   Your queue is empty. Play a track from the Explorer.

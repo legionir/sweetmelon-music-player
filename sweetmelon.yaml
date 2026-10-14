@@ -18,7 +18,7 @@ project:
 #   npm run detect            # same report, no Dart needed (reads www/)
 plugin_selection:
   mode: auto
-  include: [audio, storage, toast, wake_lock, share, file_picker, back_button, haptic, file_system, permission, safe_area]
+  include: [audio, storage, toast, wake_lock, share, back_button, haptic, file_system, permission, safe_area]
   exclude: []
 
 plugins: {}

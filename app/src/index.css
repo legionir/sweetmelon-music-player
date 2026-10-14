@@ -3,20 +3,29 @@
 
 html {
   color-scheme: dark;
-  /* No sideways scroll and no pinch/double-tap zoom: this is an app, not a page. */
-  overflow-x: hidden;
+  /* No pinch/double-tap zoom: this is an app, not a page. */
   touch-action: pan-x pan-y;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Status bar height: the web view draws under it. main.tsx refines the value
+     from the safe_area plugin and keeps it fresh when the app comes back. */
+  --safe-top: 28px;
+}
+
+/* The page never scrolls (so a system swipe cannot move it); lists scroll
+   inside <main>. */
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
   font-family: "Outfit", ui-sans-serif, system-ui, sans-serif;
   background-color: #07070d;
-  overflow-x: hidden;
   overscroll-behavior: none;
-  /* Space for the status bar; set from the safe_area plugin in main.tsx. */
-  padding-top: var(--safe-top, 0px);
+  padding-top: var(--safe-top);
 }
 
 /* Text is not selectable, nothing can be dragged or long-pressed into a menu. */

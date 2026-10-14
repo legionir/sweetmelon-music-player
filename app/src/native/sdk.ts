@@ -49,14 +49,6 @@ export interface SweetmelonSdk {
     shareText(text: string, subject?: string | null): Promise<unknown>;
   };
 
-  filePicker: {
-    pickFiles(options: {
-      multiple?: boolean;
-      type?: string;
-      allowedExtensions?: string[];
-    }): Promise<{ picked?: boolean; files?: PickedFile[]; count?: number }>;
-  };
-
   backButton: {
     enableIntercept(): Promise<unknown>;
     disableIntercept(): Promise<unknown>;
@@ -69,7 +61,8 @@ export interface SweetmelonSdk {
   };
 
   permission: {
-    request(permission: string): Promise<unknown>;
+    request(permission: string): Promise<{ granted?: boolean; permanentlyDenied?: boolean }>;
+    openSettings(): Promise<unknown>;
   };
 
   safeArea: {

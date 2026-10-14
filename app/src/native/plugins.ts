@@ -9,7 +9,7 @@
  *
  * Each helper degrades gracefully so the same bundle also runs in a browser.
  */
-import { bridgeIsNative, type BridgeStatus, type BrowseResult, type PickedFile } from "./sdk";
+import { bridgeIsNative, type BridgeStatus, type BrowseResult } from "./sdk";
 
 /** `storage` plugin — JSON key-value store (SharedPreferences on the device). */
 export async function storeGet<T>(key: string, fallback: T): Promise<T> {
@@ -56,20 +56,6 @@ export async function setWakeLock(enabled: boolean): Promise<void> {
   }
 }
 
-/** `file_picker` plugin — import audio files from the device. */
-export async function pickAudioFiles(): Promise<PickedFile[]> {
-  if (!window.NativeSDK) return [];
-  try {
-    const result = await window.NativeSDK.filePicker.pickFiles({
-      multiple: true,
-      type: "audio",
-    });
-    return result?.files ?? [];
-  } catch {
-    return [];
-  }
-}
-
 /** `back_button` plugin — Android back button as in-app navigation. */
 export async function interceptBackButton(
   onPressed: () => void,
@@ -99,15 +85,39 @@ export async function minimizeApp(): Promise<void> {
 /** File types the player can play; the browser only lists these (and folders). */
 export const AUDIO_EXTENSIONS = ["mp3", "m4a", "aac", "wav", "flac", "ogg", "oga", "opus", "wma", "amr", "mid"];
 
-/** `permission` plugin — read access to the music on the device (Android 13+ and older). */
-export async function requestAudioAccess(): Promise<void> {
-  if (!window.NativeSDK) return;
-  for (const name of ["audio", "storage"]) {
+export interface AudioAccess {
+  granted: boolean;
+  /** The system will not ask again: only the app settings can change it. */
+  permanentlyDenied: boolean;
+}
+
+/**
+ * `permission` plugin — read access to the music on the device. Android 13+
+ * asks for "music and audio", older versions for "storage": either one is enough.
+ */
+export async function requestAudioAccess(): Promise<AudioAccess> {
+  const access: AudioAccess = { granted: false, permanentlyDenied: false };
+  if (!window.NativeSDK) return access;
+  for (const name of ["storage", "audio"]) {
     try {
-      await window.NativeSDK.permission.request(name);
+      const result = await window.NativeSDK.permission.request(name);
+      if (result?.granted) access.granted = true;
+      if (result?.permanentlyDenied) access.permanentlyDenied = true;
     } catch {
-      /* unknown on this OS version: the listing below shows what is readable */
+      /* unknown on this OS version */
     }
+  }
+  if (access.granted) access.permanentlyDenied = false;
+  return access;
+}
+
+/** `permission` plugin — the app's page in the system settings. */
+export async function openAppSettings(): Promise<void> {
+  if (!window.NativeSDK) return;
+  try {
+    await window.NativeSDK.permission.openSettings();
+  } catch {
+    /* ignore */
   }
 }
 
@@ -121,18 +131,21 @@ export async function browseStorage(path: string): Promise<BrowseResult> {
 }
 
 /**
- * `safe_area` plugin — height of the status bar, as a CSS variable. The web
- * view draws under it, so without this the header sits behind the clock.
+ * `safe_area` plugin — height of the status bar, as the CSS variable
+ * `--safe-top`. The web view draws under the bar, so without it the header sits
+ * behind the clock. Never smaller than 24 px: a read of 0 right after the app
+ * comes back from another app must not push the page under the bar.
  */
 export async function applySafeArea(): Promise<void> {
   if (!window.NativeSDK) return;
+  let top = 0;
   try {
     const insets = await window.NativeSDK.safeArea.getInsets();
-    const top = Math.round(insets?.padding?.top ?? 0);
-    document.documentElement.style.setProperty("--safe-top", `${top > 0 ? top : 28}px`);
+    top = Math.round(insets?.padding?.top ?? 0);
   } catch {
-    document.documentElement.style.setProperty("--safe-top", "28px");
+    /* keep the default */
   }
+  document.documentElement.style.setProperty("--safe-top", `${Math.max(top, 24)}px`);
 }
 
 export function bridgeStatus(): BridgeStatus {

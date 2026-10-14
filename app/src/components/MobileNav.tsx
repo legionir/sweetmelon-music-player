@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { Compass, Disc3, FolderOpen, Music4 } from "lucide-react";
 import { cn } from "../utils/cn";
-import { CoreStatus } from "./CoreStatus";
 
 const items = [
   { to: "/", label: "Explorer", icon: Compass, end: true },
@@ -17,10 +16,7 @@ export function MobileNav() {
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-fuchsia-500 via-violet-500 to-cyan-400">
           <Music4 className="h-4 w-4 text-white" />
         </div>
-        <span className="hidden text-sm font-bold text-white min-[460px]:inline">SWEETMELON</span>
-        <span className="hidden min-[360px]:block">
-          <CoreStatus variant="pill" />
-        </span>
+        <span className="truncate text-sm font-bold text-white">Melon Player</span>
       </div>
       <nav className="flex shrink-0 items-center gap-1 rounded-full bg-white/5 p-1">
         {items.map(({ to, label, icon: Icon, end }) => (

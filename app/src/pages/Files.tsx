@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronLeft, FileAudio, Folder, FolderPlus, HardDrive, Play, RefreshCw } from "lucide-react";
+import { ChevronLeft, FileAudio, Folder, HardDrive, Play, RefreshCw, ShieldAlert } from "lucide-react";
 import type { BrowseEntry } from "../native/sdk";
-import { browseStorage, requestAudioAccess } from "../native/plugins";
-import { addDeviceFiles, deviceTrack } from "../data/library";
-import { notify } from "../native/notify";
+import { browseStorage, openAppSettings, requestAudioAccess, type AudioAccess } from "../native/plugins";
+import { deviceTrack, rememberDeviceFiles } from "../data/library";
 import { usePlayer } from "../context/PlayerContext";
 import { formatBytes } from "../utils/format";
 import { cn } from "../utils/cn";
@@ -20,7 +19,7 @@ export function Files() {
   const [items, setItems] = useState<BrowseEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [asked, setAsked] = useState(false);
+  const [access, setAccess] = useState<AudioAccess | null>(null);
 
   const native = bridge.mode === "native";
 
@@ -28,10 +27,7 @@ export function Files() {
     setLoading(true);
     setError(null);
     try {
-      if (!asked) {
-        await requestAudioAccess();
-        setAsked(true);
-      }
+      if (!access?.granted) setAccess(await requestAudioAccess());
       const result = await browseStorage(target);
       setPath(result.path);
       setParent(result.parent);
@@ -42,7 +38,7 @@ export function Files() {
     } finally {
       setLoading(false);
     }
-  }, [asked]);
+  }, [access]);
 
   useEffect(() => {
     if (native) void open("");
@@ -55,14 +51,14 @@ export function Files() {
 
   const segments = path ? path.split("/").filter(Boolean) : [];
 
-  const addFolder = async () => {
-    const added = await addDeviceFiles(files);
-    notify(
-      added.length === 0
-        ? "These files are already in your library"
-        : `Added ${added.length} file${added.length === 1 ? "" : "s"} to On this device`,
-    );
+  /** Plays a file with its folder as the queue, and remembers it for the next launch. */
+  const playFrom = (index: number) => {
+    void rememberDeviceFiles(files);
+    playQueue(tracks, index);
   };
+
+  // Folders can be listed without the permission, audio files cannot be seen.
+  const needsAccess = access !== null && !access.granted;
 
   if (!native) {
     return (
@@ -101,17 +97,39 @@ export function Files() {
       {path && files.length > 0 && (
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <button
-            onClick={() => playQueue(tracks, 0)}
+            onClick={() => playFrom(0)}
             className="flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-4 py-2 text-xs font-semibold text-white"
           >
             <Play className="h-3.5 w-3.5 fill-current" /> Play folder ({files.length})
           </button>
-          <button
-            onClick={() => void addFolder()}
-            className="flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 active:bg-white/10"
-          >
-            <FolderPlus className="h-3.5 w-3.5" /> Add to library
-          </button>
+        </div>
+      )}
+
+      {needsAccess && (
+        <div className="mb-4 flex items-start gap-3 rounded-xl border border-amber-400/20 bg-amber-500/10 p-3 text-xs text-amber-100">
+          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p>Allow access to music and audio, otherwise the audio files stay hidden.</p>
+            <div className="mt-2 flex gap-2">
+              {!access?.permanentlyDenied && (
+                <button
+                  onClick={() => {
+                    setAccess(null);
+                    void open(path);
+                  }}
+                  className="rounded-full bg-white/10 px-3 py-1.5 font-semibold"
+                >
+                  Allow
+                </button>
+              )}
+              <button
+                onClick={() => void openAppSettings()}
+                className="rounded-full bg-white/10 px-3 py-1.5 font-semibold"
+              >
+                Open settings
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -145,7 +163,7 @@ export function Files() {
           return (
             <button
               key={file.path}
-              onClick={() => playQueue(tracks, index)}
+              onClick={() => playFrom(index)}
               className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition active:bg-white/[0.07]"
             >
               <FileAudio className={cn("h-5 w-5 shrink-0", active ? "text-fuchsia-400" : "text-white/40")} />

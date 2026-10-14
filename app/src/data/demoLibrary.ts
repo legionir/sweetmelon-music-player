@@ -36,14 +36,6 @@ export const folders: FolderNode[] = [
     kind: "smart",
     description: "Tracks you've liked",
   },
-  {
-    id: "device",
-    type: "folder",
-    name: "On this device",
-    parentId: "root",
-    kind: "device",
-    description: "Audio files you imported",
-  },
   { id: "playlists", type: "folder", name: "Playlists", parentId: "root", kind: "default" },
   {
     id: "pl-chill",

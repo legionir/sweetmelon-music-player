@@ -5,8 +5,20 @@ import App from "./App";
 import { applySafeArea } from "./native/plugins";
 import { waitForBridge } from "./native/sdk";
 
+// The status bar height is read at launch and again whenever the app comes back
+// from another app, rotates or regains focus.
 void waitForBridge().then((native) => {
-  if (native) void applySafeArea();
+  if (!native) return;
+  const refresh = () => void applySafeArea();
+  refresh();
+  window.addEventListener("resize", refresh);
+  window.addEventListener("focus", refresh);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      refresh();
+      window.setTimeout(refresh, 400);
+    }
+  });
 });
 
 createRoot(document.getElementById("root")!).render(

@@ -8,7 +8,6 @@
  * -----------------------------------------------------------------------
  */
 import type { FolderNode, Track } from "../types";
-import { pickAudioFiles } from "../native/plugins";
 import type { PickedFile } from "../native/sdk";
 import { folders as demoFolders, tracks as demoTracks } from "./demoLibrary";
 import {
@@ -122,14 +121,6 @@ export async function hydrateLibrary(): Promise<void> {
   publish();
 }
 
-/**
- * Opens the device file picker (`file_picker` plugin) and adds the picked
- * audio files to "On this device". Returns the tracks that were added.
- */
-export async function importAudioFiles(): Promise<Track[]> {
-  return addDeviceFiles(await pickAudioFiles());
-}
-
 /** A playable track for a file on the device, without adding it to the library. */
 export function deviceTrack(file: PickedFile): Track {
   const id = `device-${hashId(file.path)}`;
@@ -147,8 +138,8 @@ export function deviceTrack(file: PickedFile): Track {
   );
 }
 
-/** Adds files (picked or found by browsing) to "On this device". Returns the new tracks. */
-export async function addDeviceFiles(files: PickedFile[]): Promise<Track[]> {
+/** Remembers files played from the Files tab, so the queue survives a restart. */
+export async function rememberDeviceFiles(files: PickedFile[]): Promise<Track[]> {
   if (files.length === 0) return [];
 
   const known = new Set(importedFiles.map((file) => file.path));

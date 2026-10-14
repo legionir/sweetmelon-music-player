@@ -23,8 +23,8 @@ export function Sidebar() {
           <Music4 className="h-5 w-5 text-white" strokeWidth={2.4} />
         </div>
         <div>
-          <p className="text-sm font-bold tracking-wide text-white">SWEETMELON</p>
-          <p className="text-[11px] text-white/40">music player</p>
+          <p className="text-sm font-bold tracking-wide text-white">Melon Player</p>
+          <p className="text-[11px] text-white/40">your music</p>
         </div>
       </div>
 

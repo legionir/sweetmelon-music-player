@@ -60,7 +60,7 @@ const recorder = `
   })();
 
   window.__calls = [];
-  ["audio", "storage", "toast", "wakeLock", "share", "filePicker", "haptic"].forEach(function (plugin) {
+  ["audio", "storage", "toast", "wakeLock", "share", "haptic"].forEach(function (plugin) {
     var target = window.NativeSDK && window.NativeSDK[plugin];
     if (!target) return;
     Object.keys(target).forEach(function (method) {
@@ -122,7 +122,7 @@ await waitFor(() => text().includes("Recently Added"));
 check("app mounts and lists folders", text().includes("Recently Added"));
 check(
   "library renders folder cards",
-  text().includes("On this device") && text().includes("Playlists"),
+  text().includes("Favorites") && text().includes("Playlists"),
 );
 check(
   nativeMode ? "simulated bridge reported as native core" : "web mode reported in the header",

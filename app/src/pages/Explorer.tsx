@@ -1,18 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   ArrowDownAZ,
   Clock,
-  HardDrive,
   LayoutGrid,
   Search,
   Shuffle,
   SlidersHorizontal,
-  Upload,
 } from "lucide-react";
 import type { FolderNode, Track } from "../types";
-import { importAudioFiles, libraryService, subscribeLibrary } from "../data/library";
-import { notify } from "../native/notify";
+import { libraryService, subscribeLibrary } from "../data/library";
 import { usePlayer } from "../context/PlayerContext";
 import { Breadcrumbs } from "../components/Breadcrumbs";
 import { FolderCard } from "../components/FolderCard";
@@ -33,18 +30,20 @@ export function Explorer() {
   const [sortKey, setSortKey] = useState<SortKey>("title");
   const [sortOpen, setSortOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [importing, setImporting] = useState(false);
   /** Bumped whenever the library changes (import, like, learned duration). */
   const [libraryVersion, setLibraryVersion] = useState(0);
 
-  const { currentTrack, isPlaying, playTrack, toggleLike, addToQueue, playQueue, bridge } =
-    usePlayer();
+  const { currentTrack, isPlaying, playTrack, toggleLike, addToQueue, playQueue } = usePlayer();
 
   useEffect(() => subscribeLibrary(() => setLibraryVersion((version) => version + 1)), []);
 
+  // The skeleton is for opening a folder. A like or a learned duration reloads the
+  // same folder quietly, so the list does not flash.
+  const shownFolder = useRef<string | null>(null);
+
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
+    if (shownFolder.current !== folderId) setLoading(true);
     Promise.all([
       libraryService.getFolderContents(folderId),
       libraryService.getFolderPath(folderId === "recent" || folderId === "favorites" ? "root" : folderId),
@@ -59,6 +58,7 @@ export function Explorer() {
           ? [...path, { id: "favorites", type: "folder", name: "Favorites", parentId: "root" }]
           : path,
       );
+      shownFolder.current = folderId;
       setLoading(false);
     });
     return () => {
@@ -112,21 +112,6 @@ export function Explorer() {
     : folderId === "root"
     ? "Your Library"
     : currentFolder?.name ?? "Library";
-
-  const onImport = async () => {
-    if (bridge.mode !== "native") {
-      notify("Importing files needs the Android/iOS build");
-      return;
-    }
-    setImporting(true);
-    try {
-      const added = await importAudioFiles();
-      if (added.length === 0) notify("No new audio files picked");
-      else notify(`Imported ${added.length} file${added.length === 1 ? "" : "s"}`);
-    } finally {
-      setImporting(false);
-    }
-  };
 
   const playAll = (shuffled = false) => {
     if (sortedTracks.length === 0) return;
@@ -186,13 +171,6 @@ export function Explorer() {
             className="flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 transition hover:bg-white/5 disabled:opacity-30"
           >
             <Shuffle className="h-3.5 w-3.5" /> Shuffle
-          </button>
-          <button
-            onClick={onImport}
-            disabled={importing}
-            className="flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 transition hover:bg-white/5 disabled:opacity-30"
-          >
-            <Upload className="h-3.5 w-3.5" /> {importing ? "Importing…" : "Import"}
           </button>
         </div>
         <div className="relative">
@@ -254,11 +232,8 @@ export function Explorer() {
           ))}
         {!loading && sortedTracks.length === 0 && childFolders.length === 0 && (
           <div className="mt-16 flex flex-col items-center gap-3 text-center">
-            {folderId === "device" && <HardDrive className="h-6 w-6 text-white/20" />}
             <p className="text-sm text-white/30">
-              {folderId === "device"
-                ? "No imported files yet. Use the Files tab to browse your storage and add whole folders, or Import to pick files."
-                : folderId === "favorites"
+              {folderId === "favorites"
                   ? "Nothing liked yet. Tap the heart on a track."
                   : "No audio files found here."}
             </p>
