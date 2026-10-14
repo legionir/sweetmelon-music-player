@@ -1,4 +1,4 @@
-# Pinned to core v2.4.0. Change it with: sweetmelon upgrade --to <version>
+# Pinned to core v2.4.1. Change it with: sweetmelon upgrade --to <version>
 #
 # Every job builds the web app from app/ first (npm ci + npm run build), so the
 # package always matches the sources in this repository. The Sweetmelon action
@@ -52,10 +52,11 @@ jobs:
       - name: Smoke test the bundle
         run: npm run smoke
 
-      - uses: legionir/sweetmelon@v2.4.0
+      - uses: legionir/sweetmelon@v2.4.1
         with:
           target: apk
           www: www
+          icon: icon.png
           config: sweetmelon.yaml
           package_name: ${{ inputs.package_name }}
           dart_package: ${{ inputs.dart_package }}
@@ -87,10 +88,11 @@ jobs:
       - name: Smoke test the bundle
         run: npm run smoke
 
-      - uses: legionir/sweetmelon@v2.4.0
+      - uses: legionir/sweetmelon@v2.4.1
         with:
           target: aab
           www: www
+          icon: icon.png
           config: sweetmelon.yaml
           package_name: ${{ inputs.package_name }}
           dart_package: ${{ inputs.dart_package }}
@@ -122,10 +124,11 @@ jobs:
       - name: Smoke test the bundle
         run: npm run smoke
 
-      - uses: legionir/sweetmelon@v2.4.0
+      - uses: legionir/sweetmelon@v2.4.1
         with:
           target: ios
           www: www
+          icon: icon.png
           package_name: ${{ inputs.package_name }}
           dart_package: ${{ inputs.dart_package }}
           app_name: ${{ inputs.app_name }}
