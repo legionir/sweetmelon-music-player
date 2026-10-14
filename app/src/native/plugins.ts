@@ -9,7 +9,7 @@
  *
  * Each helper degrades gracefully so the same bundle also runs in a browser.
  */
-import { bridgeIsNative, type BridgeStatus, type PickedFile } from "./sdk";
+import { bridgeIsNative, type BridgeStatus, type BrowseResult, type PickedFile } from "./sdk";
 
 /** `storage` plugin — JSON key-value store (SharedPreferences on the device). */
 export async function storeGet<T>(key: string, fallback: T): Promise<T> {
@@ -93,6 +93,45 @@ export async function minimizeApp(): Promise<void> {
     await window.NativeSDK.backButton.minimizeApp();
   } catch {
     /* ignore */
+  }
+}
+
+/** File types the player can play; the browser only lists these (and folders). */
+export const AUDIO_EXTENSIONS = ["mp3", "m4a", "aac", "wav", "flac", "ogg", "oga", "opus", "wma", "amr", "mid"];
+
+/** `permission` plugin — read access to the music on the device (Android 13+ and older). */
+export async function requestAudioAccess(): Promise<void> {
+  if (!window.NativeSDK) return;
+  for (const name of ["audio", "storage"]) {
+    try {
+      await window.NativeSDK.permission.request(name);
+    } catch {
+      /* unknown on this OS version: the listing below shows what is readable */
+    }
+  }
+}
+
+/**
+ * `file_system` plugin — one folder of the device's shared storage, read-only.
+ * Pass "" for the storage roots. Throws with the plugin's message on failure.
+ */
+export async function browseStorage(path: string): Promise<BrowseResult> {
+  if (!window.NativeSDK) throw new Error("Browsing files needs the Android/iOS build");
+  return window.NativeSDK.fileSystem.browse(path, { extensions: AUDIO_EXTENSIONS });
+}
+
+/**
+ * `safe_area` plugin — height of the status bar, as a CSS variable. The web
+ * view draws under it, so without this the header sits behind the clock.
+ */
+export async function applySafeArea(): Promise<void> {
+  if (!window.NativeSDK) return;
+  try {
+    const insets = await window.NativeSDK.safeArea.getInsets();
+    const top = Math.round(insets?.padding?.top ?? 0);
+    document.documentElement.style.setProperty("--safe-top", `${top > 0 ? top : 28}px`);
+  } catch {
+    document.documentElement.style.setProperty("--safe-top", "28px");
   }
 }
 

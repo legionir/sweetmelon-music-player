@@ -188,6 +188,11 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         case "ended":
           handleTrackEnd();
           break;
+        case "error":
+          setIsPlaying(false);
+          setIsLoading(false);
+          notify(event.message, "long");
+          break;
       }
     },
     [handleTrackEnd],

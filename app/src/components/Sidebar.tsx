@@ -1,10 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { Compass, Disc3, Heart, ListMusic, Music4, Radio } from "lucide-react";
+import { Compass, Disc3, FolderOpen, Heart, ListMusic, Music4, Radio } from "lucide-react";
 import { cn } from "../utils/cn";
 import { CoreStatus } from "./CoreStatus";
 
 const navItems = [
   { to: "/", label: "Explorer", icon: Compass, end: true },
+  { to: "/files", label: "Files", icon: FolderOpen, end: false },
   { to: "/now-playing", label: "Now Playing", icon: Disc3, end: false },
 ];
 

@@ -7,6 +7,7 @@ import { PlayerBar } from "./components/PlayerBar";
 import { ToastHost } from "./components/ToastHost";
 import { Explorer } from "./pages/Explorer";
 import { NowPlaying } from "./pages/NowPlaying";
+import { Files } from "./pages/Files";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
               <main className="flex-1 pb-24">
                 <Routes>
                   <Route path="/" element={<Explorer />} />
+                  <Route path="/files" element={<Files />} />
                   <Route path="/now-playing" element={<NowPlaying />} />
                 </Routes>
               </main>
